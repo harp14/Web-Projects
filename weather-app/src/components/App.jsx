@@ -40,8 +40,28 @@ function App() {
     getWeather();
   }, [search]);
   
+  // Return client's current coordinates
+  const getLocation = new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser'));
+    } else {
+      navigator.geolocation.getCurrentPosition((data, err) => { 
+        if (!err) {
+          
+          const locationData = {
+            latitude: data.coords.latitude,
+            longitude: data.coords.longitude
+          }
+          resolve(locationData);
+        } else {
+          reject(new Error(err));
+        }
+      });
+    }
+  });
+  
   // Get weather and set weatherData useState variable
-  const getWeather = async () => {
+  const getWeather = async () => {  
     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search}&units=metric&appid=${API_KEY}`)
     .then((res) => {
       const result = res.json();
@@ -59,6 +79,30 @@ function App() {
     });
   }
 
+  // Pass coordinate data to getLocality
+  getLocation
+  .then((data) => {
+    getLocality(data);
+  })
+  .catch((error) => {
+      console.log(error);
+    }
+  );
+
+  // Get locality and set as current search value
+  const getLocality = async (coordinates) => {
+    const latitude = coordinates.latitude;
+    const longitude = coordinates.longitude;
+    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
+    .then((res) => {
+      const response = res.json();
+      response.then(data => {
+        setSearch(data.locality);
+      });
+    });
+  }
+
+  // Show error within location bar
   function handleError(error) {
     setError({
       state: true,
@@ -66,6 +110,7 @@ function App() {
     });
   }
 
+  // Handle search field value change which in turn causes useEffect to run
   function updateSearch(event) {
     const fieldValue = event.target.value;
     setSearch(fieldValue);
@@ -97,12 +142,9 @@ function App() {
             />
           }
         </form>
-
         <WeatherCard
           weatherData={weatherData}
         />
-
-        
       </div>
     </div>
   );
