@@ -39,7 +39,7 @@ function WeatherCard(props) {
     return (
         <div className="weather-card">
             <Typography variant="h3">Weather in {location}</Typography>
-            <img src={"http://openweathermap.org/img/wn/" + weatherIcon + "@4x.png"} alt="test"/>
+            <img src={"./assets/img/" + weatherIcon + "@4x.png"} alt="test"/>
             <Typography variant="h5">Current weather: {weatherDescription}.</Typography>
             <div className="info-section">
                 <div className="info-box">
