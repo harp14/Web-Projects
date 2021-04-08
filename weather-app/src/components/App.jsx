@@ -34,7 +34,8 @@ function App() {
   });
   const [search, setSearch] = useState("");
   const [error, setError] = useState({state: false, error_message: ""});
-  
+  const [gotLocation, setGotLocation] = useState(false);
+
   // Update page when typing
   useEffect(() => {
     getWeather();
@@ -47,7 +48,6 @@ function App() {
     } else {
       navigator.geolocation.getCurrentPosition((data, err) => { 
         if (!err) {
-          
           const locationData = {
             latitude: data.coords.latitude,
             longitude: data.coords.longitude
@@ -79,15 +79,18 @@ function App() {
     });
   }
 
-  // Pass coordinate data to getLocality
-  getLocation
-  .then((data) => {
-    getLocality(data);
-  })
-  .catch((error) => {
-      console.log(error);
-    }
-  );
+
+  // If not got current location get coordinates and pass to getLocality
+  if (!gotLocation) {
+    getLocation
+    .then((data) => {
+      getLocality(data);
+    })
+    .catch((error) => {
+        console.log(error);
+      }
+    );
+  }
 
   // Get locality and set as current search value
   const getLocality = async (coordinates) => {
@@ -98,7 +101,11 @@ function App() {
       const response = res.json();
       response.then(data => {
         setSearch(data.locality);
+        setGotLocation(true);
       });
+    })
+    .catch((error) => {
+      console.log(error);
     });
   }
 
