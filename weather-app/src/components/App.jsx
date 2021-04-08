@@ -63,7 +63,7 @@ function App() {
   // Get weather and set weatherData useState variable
   const getWeather = async () => {  
     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search}&units=metric&appid=${API_KEY}`)
-    .then((res) => {
+    .then(res => {
       const result = res.json();
       result.then(data => {
         // Successfully retrieved data
@@ -76,6 +76,9 @@ function App() {
           handleError(data.message);
         }
       });
+    })
+    .catch(error => {
+      console.log(error);
     });
   }
 
@@ -126,7 +129,7 @@ function App() {
   return (
     <div className="container">
       <div className="App">
-        <form className="search-form">          
+        <div className="search-form">          
           {error.state ?
             <TextField 
               className="search-bar"
@@ -148,7 +151,7 @@ function App() {
               variant="outlined"
             />
           }
-        </form>
+        </div>
         <WeatherCard
           weatherData={weatherData}
         />
